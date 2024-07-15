@@ -1,0 +1,66 @@
+-- название и продолжительность самого длительного трека.
+select tracks."Name", tracks.duration 
+from tracks
+order by tracks.duration desc
+limit 1;
+
+
+-- Название треков, продолжительность которых не менее 3,5 минут.
+select tracks."Name"
+from tracks
+where tracks.duration > 210;
+
+
+-- Названия сборников, вышедших в период с 2018 по 2020 год включительно.
+select "Collection of tracks"."Name"
+from "Collection of tracks"
+where ("Collection of tracks"."Year" > 2018) and ("Collection of tracks"."Year" < 2020);
+
+
+-- Исполнители, чьё имя состоит из одного слова.
+select artists."name"
+from artists
+where artists."name" not like '% %';
+
+
+--Название треков, которые содержат слово «мой» или «my».
+select t."Name" 
+from tracks t
+where (t."Name" like '%My%') or (t."Name" like '%Мой%');
+
+
+--Количество исполнителей в каждом жанре.
+select g."Name", COUNT(a."name") from artists a
+join "Genres/Artists" ga on a.artist_id = ga.artist_id
+join genres g on ga.genre_id = g.genre_id
+group by g."Name"; 
+
+
+
+--Количество треков, вошедших в альбомы 2019–2020 годов.
+select count(t."Name") from tracks t 
+join albums a on t."Album_id" = a.album_id 
+where (a."Year" <= 2020) and (a."Year" >= 2019);
+
+--Средняя продолжительность треков по каждому альбому.
+select a."Name", AVG(duration) from tracks t 
+join albums a on t."Album_id" = a.album_id
+group by a."Name";
+
+-- Все исполнители, которые не выпустили альбомы в 2020 году.
+select a."name", a2."Year" from artists a 
+join "Albums/Artists" aa on a.artist_id = aa.artist_id
+join albums a2 on aa.album_id = a2.album_id
+group by a."name", a2."Year"
+having a2."Year" <> 2020;
+
+
+--Названия сборников, в которых присутствует конкретный исполнитель (выберите его сами).
+select a."name", ct."Name" from artists a 
+join "Albums/Artists" aa on a.artist_id = aa.artist_id
+join albums a2 on aa.album_id = a2.album_id
+join tracks t on a2.album_id = t.Album_id
+join "Tracks/collection" tc on t.track_id = tc.track_id
+join "Collection of tracks" ct on ct.collection_id = tc.collection_id
+group by a."name", c."Name"
+where a."name" = 'Maroon 5';
